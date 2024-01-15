@@ -480,22 +480,22 @@ MIRROR-TRANSFORMS are also evaluated at the time."
 (defclass snippet--object ()
   ;; keep the two initargable slots on top otherwise everything breaks.
   ;; TODO: report this to Stefan or Eric
-  ((parent :initarg :parent :reader snippet--object-parent)
-   (prev :initarg :prev :accessor snippet--object-prev)
-   (start :accessor snippet--object-start)
-   (end :accessor snippet--object-end)
-   (next :accessor snippet--object-next)
-   (buffer :initform (current-buffer) :reader snippet--object-buffer)))
+  ((parent :initform nil :initarg :parent :reader snippet--object-parent)
+   (prev :initform nil :initarg :prev :accessor snippet--object-prev)
+   (start :initform nil :accessor snippet--object-start)
+   (end :initform nil :accessor snippet--object-end)
+   (next :initform nil :accessor snippet--object-next)
+   (buffer :initform nil :initform (current-buffer) :reader snippet--object-buffer)))
 
 (defclass snippet--field (snippet--object)
-  ((name :initarg :name :accessor snippet--field-name)
-   (modified-p :initform nil :accessor snippet--field-modified-p)
-   (mirrors :initform (list) :accessor snippet--field-mirrors))
+  ((name :initform nil :initarg :name :accessor snippet--field-name)
+   (modified-p :initform nil :initform nil :accessor snippet--field-modified-p)
+   (mirrors :initform nil :initform (list) :accessor snippet--field-mirrors))
   :documentation "coiso")
 
 (defclass snippet--mirror (snippet--object)
-  ((source :initarg :source :accessor snippet--mirror-source)
-   (transform :initarg :transform :accessor snippet--mirror-transform))
+  ((source :initform nil :initarg :source :accessor snippet--mirror-source)
+   (transform :initform nil :initarg :transform :accessor snippet--mirror-transform))
   :documentation "coiso")
 
 (defclass snippet--exit (snippet--field) ())
