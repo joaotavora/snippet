@@ -1,6 +1,6 @@
-;;; snippet.el --- yasnippet's engine distilled  -*- lexical-binding: t; -*-
+;;; snippet.el --- Yasnippet's engine distilled  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2013-2015  Free Software Foundation
+;; Copyright (C) 2013-2024  Free Software Foundation
 
 ;; Author: João Távora <joaotavora@gmail.com>
 ;; Keywords: convenience
@@ -19,47 +19,56 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;; Commentary:
 
-;; The yasnippet snippet insertion and navigation engine, though very powerful,
+;; The Yasnippet snippet insertion and navigation engine, though very powerful,
 ;; is bloated and its implementation much contrived.
 ;;
-;; snippet.el's main goal is to provide yasnippet and other snippet-managing
+;; snippet.el's main goal is to provide Yasnippet and other snippet-managing
 ;; frontends with the bare minimum funcionality to define, insert, navigate and
 ;; undo snippets.
 ;;
-;; Snippets are defined via the `define-dynamic-snippet' or
-;; `define-static-snippet' entrypoints. The snippet definition syntax is quite
-;; different (TODO: how so?). Static snippets have better syntax checks at
-;; compile-time, but complex snippets may be easier to write as dynamic
-;; snippets. Both are as powerful as yasnippet's, in turn inspired by
-;; textmate's). There are also `with-dynamic-snippet' and `with-static-snippet'
-;; macros to use in your own defuns.
+;; Named snippets are defined via the `define-dynamic-snippet' or
+;; `define-static-snippet' entrypoints.  These have snippet-definition syntax:
 ;;
-;; The snippet definitions defined with both macros `define-*-snippet' macros
-;; can be `edebug'ed and stepped through on snippet insertion and
-;; navigation. (TODO: for `define-dynamic-snippet', this works for forms in
-;; snippet fields, but fails for mirrors for some reason.)
+;; * Static snippets have better syntax checks at compile-time
+;;
+;; * Dynamic snippets may make it easier to write complex snippets, but some
+;;   mistakes won't be caught until the user actually expands them
+;;
+;; We'll see what that syntax is later (TODO: When?), but rest assured both
+;; syntaxes allow the user to express snippets as complex as Yasnippets'.
+;;
+;; Other entrypoints are `with-dynamic-snippet' and `with-static-snippet'
+;; macros.  These allow you to make your own arbitrary functions which at a
+;; certain point will define (and possibly expand) an anonymous snippet.
+;;
+;; Whichever way to choose to define a snippet, it can be `edebug'ed and stepped
+;; through on snippet insertion and navigation.
+;;
+;; FIXME: for `define-dynamic-snippet', this works for forms in snippet fields,
+;; but fails for mirrors for some reason.
 ;;
 ;; Once inserted into a buffer, snippets are navigated using
 ;; `snippet-next-field' and `snippet-prev-field', bound to TAB and S-TAB by
 ;; default.
 ;;
-;; Funcionality such as snippet management, mode management, tab-trigerring or
-;; any other fanciness are *not* offered.  `define-snippet's PROPERTIES
-;; mechanism *might* become extensible to provide frontends such as yasnippet
-;; the capability to conveniently implement said fanciness.
+;; Yasnippet features such as "snippet management", "mode management",
+;; "tab-trigerring" or any other fanciness are at the moment deliberaly NOT in
+;; this library.  `define-snippet's PROPERTIES mechanism MIGHT become extensible
+;; to provide frontends such as yasnippet the capability to conveniently
+;; implement said fanciness.
 ;;
 ;; TODO: primary field transformations: the (&transform ...) option to &field
 ;;       constructs. In `define-dynamic-snippet', mirror forms should only be
 ;;       evaluated for value. &exit should be generalized to also allow nested
 ;;       fields.
-;;       
+;;
 ;; TODO: auto-indentation of the inserted snippet
 ;;
 ;; TODO: there should be somewhere a PROPERTIES argument, unimplemented at time
 ;; of writing, in the `define-snippet' macro which should probably understand a
 ;; set of properties controlling snippet's indentation, custom keymapping and
 ;; other per-snippet characteristics affecting snippet.el's core functionality.
-;; 
+;;
 ;; TODO: undo, specifically snippet revival
 ;;
 ;; TODO: more documentation
@@ -651,7 +660,7 @@ MIRROR-TRANSFORMS are also evaluated at the time."
                 (not (snippet--exiting-p))
                 ;; Also don't run if in the middle of an undo
                 (not undo-in-progress))
-           
+
            ;; field clearing: if we're doing an insertion and the field hasn't
            ;; been modified yet, we're going to delete previous contents and
            ;; leave just the newly inserted text.
@@ -758,7 +767,6 @@ Skips over nested fields if their parent has been modified."
          (error "No active snippet"))))
 
 (defun snippet--exiting-p ()
-  
   (overlay-get snippet--field-overlay 'snippet--exit-reason))
 
 
@@ -844,12 +852,12 @@ Skips over nested fields if their parent has been modified."
 (defun snippet--post-command-hook ()
   ;; TODO: exiting the snippet might someday run user-provided code, hence the
   ;; apparent overengineeredness
-  ;; 
+  ;;
   (let (remove-self exit-reason)
     (cond
      ((and snippet--field-overlay
            (not (overlay-buffer snippet--field-overlay)))
-      ;; Something deleted the overlay 
+      ;; Something deleted the overlay
       (setq remove-self t
             exit-reason "overlay destroyed"))
      (snippet--field-overlay
